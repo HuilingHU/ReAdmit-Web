@@ -1,4 +1,4 @@
-# app.py  (FINAL – compact titles, full features)
+# app.py  (FINAL – larger main title, colored section titles, uniform lab inputs)
 
 import os
 import re
@@ -22,7 +22,7 @@ FEATURE_ORDER = [
 ]
 
 # =====================================================
-# Page & global style (smaller titles)
+# Page & global style
 # =====================================================
 st.set_page_config(page_title="ReAdmit-再入ICU风险预测", layout="wide")
 
@@ -34,27 +34,33 @@ body, .stApp {
     line-height: 1.25;
 }
 
-/* 页面主标题 */
+/* 主标题 */
 .main-title {
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin-bottom: 0.4rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #0b3c5d;
+    margin-bottom: 0.5rem;
 }
 
-/* 各部分标题 */
-.section-title {
-    font-size: 0.88rem;
-    font-weight: 600;
-    margin-top: 0.2rem;
-    margin-bottom: 0.3rem;
-}
+/* 各部分标题颜色 */
+.title-basic { font-size: 0.9rem; font-weight: 600; color: #1f7a8c; }
+.title-vital { font-size: 0.9rem; font-weight: 600; color: #b23a48; }
+.title-other { font-size: 0.9rem; font-weight: 600; color: #5f4b8b; }
+.title-charlson { font-size: 0.9rem; font-weight: 600; color: #2f855a; }
+.title-lab { font-size: 0.9rem; font-weight: 600; color: #3b5b92; }
 
-/* 小分组标题（血常规 / 凝血等） */
+/* 实验室子标题 */
 .group-title {
     font-size: 0.82rem;
     font-weight: 600;
-    margin-top: 0.3rem;
-    margin-bottom: 0.2rem;
+    color: #334e68;
+    margin-top: 0.35rem;
+    margin-bottom: 0.25rem;
+}
+
+/* 强制所有输入框等宽 */
+div[data-baseweb="input"] {
+    width: 100% !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -117,7 +123,7 @@ with st.form("icu_form"):
 
     # -------- 基本信息 --------
     with col1:
-        st.markdown('<div class="section-title">📝 基本信息</div>', unsafe_allow_html=True)
+        st.markdown('<div class="title-basic">📝 基本信息</div>', unsafe_allow_html=True)
         age = st.number_input("年龄（岁）", min_value=0, max_value=120, value=None)
         gender = st.radio("性别", ["男", "女"])
         genderscore = 1 if gender == "男" else 0
@@ -126,7 +132,7 @@ with st.form("icu_form"):
 
     # -------- 生命体征 --------
     with col2:
-        st.markdown('<div class="section-title">❤️ 生命体征</div>', unsafe_allow_html=True)
+        st.markdown('<div class="title-vital">❤️ 生命体征</div>', unsafe_allow_html=True)
         hr = st.number_input("心率（次/分）", value=None)
         sbp = st.number_input("收缩压（mmHg）", value=None)
         dbp = st.number_input("舒张压（mmHg）", value=None)
@@ -137,7 +143,7 @@ with st.form("icu_form"):
 
     # -------- 其他体征 --------
     with col3:
-        st.markdown('<div class="section-title">🌡 其他体征</div>', unsafe_allow_html=True)
+        st.markdown('<div class="title-other">🌡 其他体征</div>', unsafe_allow_html=True)
         urine = st.number_input("最后24h尿量（mL）", value=None)
         o2flow = st.number_input("吸氧流量（L/min）", value=None)
         intubated = st.radio("是否气管插管/切开", ["有", "无"])
@@ -146,7 +152,7 @@ with st.form("icu_form"):
 
     # -------- Charlson --------
     with col4:
-        st.markdown('<div class="section-title">🧾 Charlson 合并症</div>', unsafe_allow_html=True)
+        st.markdown('<div class="title-charlson">🧾 Charlson 合并症</div>', unsafe_allow_html=True)
         group1 = st.multiselect(
             "1 分",
             ["心肌梗死","充血性心衰","慢性肺病","糖尿病",
@@ -171,7 +177,7 @@ with st.form("icu_form"):
 
     # -------- 影像文本 --------
     with col5:
-        st.markdown('<div class="section-title">📄 影像学检查文本</div>', unsafe_allow_html=True)
+        st.markdown('<div class="title-basic">📄 影像学检查文本</div>', unsafe_allow_html=True)
         img = st.file_uploader("上传影像学报告截图", type=["png","jpg","jpeg"])
         if img:
             ocr_text = run_ocr(img, ocr_engine)
@@ -180,7 +186,7 @@ with st.form("icu_form"):
     st.divider()
 
     # ================= 实验室检查 =================
-    st.markdown('<div class="section-title">🧪 实验室检查</div>', unsafe_allow_html=True)
+    st.markdown('<div class="title-lab">🧪 实验室检查</div>', unsafe_allow_html=True)
 
     # ---- 血常规 ----
     st.markdown('<div class="group-title">血常规</div>', unsafe_allow_html=True)
