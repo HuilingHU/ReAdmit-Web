@@ -306,6 +306,19 @@ if submitted:
         "paco2": paco2,
     }
 
+    unit_conversion = {
+        "hemoglobin": 0.1,            # g/L → g/dL
+        "albumin": 0.1,               # g/L → g/dL
+        "creatinine": 1 / 88.4,       # μmol/L → mg/dL
+        "bilirubin_total": 1 / 17.1,  # μmol/L → mg/dL
+        "glucose": 18.0,              # mmol/L → mg/dL
+        "calcium": 4.0                # mmol/L → mg/dL
+    }
+
+    for k, factor in unit_conversion.items():
+        if data.get(k) is not None:
+            data[k] = data[k] * factor
+    
     X = np.array([[float(data.get(f, 0) or 0) for f in FEATURE_ORDER]])
     prob = model.predict_proba(X)[0, 1]
     risk = "高风险" if prob >= threshold else "低风险"
