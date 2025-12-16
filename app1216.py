@@ -5,6 +5,7 @@ import re
 import numpy as np
 import joblib
 import streamlit as st
+import shap 
 
 # =====================================================
 # Feature order (MUST match training)
@@ -20,6 +21,55 @@ FEATURE_ORDER = [
     'platelet','rbc','rdw','lactate','ph','be','pao2','paco2',
     'o2_flow','mechanical_ventilation_time','invasive_ventilation'
 ]
+
+FEATURE_NAME_MAP = {
+    "admission_age": "年龄",
+    "genderscore": "性别",
+    "los_hospital": "住院时长",
+    "los_icu": "ICU住院时长",
+    "heart_rate_24hfinal": "心率",
+    "sbp_ni_24hfinal": "收缩压",
+    "dbp_ni_24hfinal": "舒张压",
+    "mbp_ni_24hfinal": "平均动脉压",
+    "spo2_24hfinal": "血氧饱和度",
+    "temperature_24hfinal": "体温",
+    "urineoutput_24hr": "24小时尿量",
+    "charlson": "Charlson 合并症指数",
+
+    "wbc": "白细胞",
+    "rbc": "红细胞",
+    "hemoglobin": "血红蛋白",
+    "hematocrit": "红细胞压积",
+    "mch": "平均红细胞血红蛋白含量",
+    "platelet": "血小板",
+    "rdw": "红细胞分布宽度",
+
+    "inr": "INR",
+    "pt": "凝血酶原时间",
+    "ptt": "活化部分凝血活酶时间",
+
+    "creatinine": "肌酐",
+    "alt": "丙氨酸氨基转移酶",
+    "ast": "天冬氨酸氨基转移酶",
+    "bilirubin_total": "总胆红素",
+    "albumin": "白蛋白",
+
+    "bicarbonate": "碳酸氢根",
+    "calcium": "钙",
+    "chloride": "氯",
+    "glucose": "血糖",
+    "sodium": "钠",
+    "potassium": "钾",
+    "lactate": "乳酸",
+    "ph": "pH",
+    "be": "碱剩余",
+    "pao2": "氧分压",
+    "paco2": "二氧化碳分压",
+
+    "o2_flow": "吸氧流量",
+    "mechanical_ventilation_time": "机械通气时长",
+    "invasive_ventilation": "有创通气"
+}
 
 # =====================================================
 # Page & global style
@@ -287,3 +337,23 @@ if submitted:
     st.subheader("📊 预测结果")
     st.metric("再入 ICU 风险概率", f"{prob:.2%}")
     st.success(f"风险分层：{risk}")
+
+    if risk == "高风险":
+        explainer = shap.TreeExplainer(model)
+        shap_values = explainer.shap_values(X)
+
+        # 二分类，取正类
+        if isinstance(shap_values, list):
+            vals = shap_values[1][0]
+        else:
+            vals = shap_values[0]
+
+        top_idx = np.argsort(np.abs(vals))[::-1][:5]
+
+        st.subheader("⚠️ 主要风险贡献因素（模型解释）")
+
+        for i in top_idx:
+            fname = FEATURE_ORDER[i]
+            cname = FEATURE_NAME_MAP.get(fname, fname)
+            direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
+            st.write(f"- **{cname}**：{direction}")
