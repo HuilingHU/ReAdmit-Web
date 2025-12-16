@@ -1,4 +1,4 @@
-# app.py  (FINAL – full, clean, clinical UI)
+# app.py  (FINAL – compact titles, full features)
 
 import os
 import re
@@ -22,13 +22,47 @@ FEATURE_ORDER = [
 ]
 
 # =====================================================
-# Page
+# Page & global style (smaller titles)
 # =====================================================
 st.set_page_config(page_title="ReAdmit-再入ICU风险预测", layout="wide")
-st.title("ReAdmit-再入ICU风险预测")
+
+st.markdown("""
+<style>
+/* 全局字体 */
+body, .stApp {
+    font-size: 0.82rem;
+    line-height: 1.25;
+}
+
+/* 页面主标题 */
+.main-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+
+/* 各部分标题 */
+.section-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-top: 0.2rem;
+    margin-bottom: 0.3rem;
+}
+
+/* 小分组标题（血常规 / 凝血等） */
+.group-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-top: 0.3rem;
+    margin-bottom: 0.2rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="main-title">ReAdmit-再入ICU风险预测</div>', unsafe_allow_html=True)
 
 # =====================================================
-# OCR (optional, text only)
+# OCR (text only)
 # =====================================================
 @st.cache_resource
 def load_ocr():
@@ -47,8 +81,7 @@ def run_ocr(img, engine):
     if not res or not res[0]:
         return ""
     text = " ".join([x[1][0] for x in res[0]])
-    text = re.sub(r"\s+", " ", text)
-    return text
+    return re.sub(r"\s+", " ", text)
 
 ocr_engine = load_ocr()
 
@@ -84,7 +117,7 @@ with st.form("icu_form"):
 
     # -------- 基本信息 --------
     with col1:
-        st.subheader("📝 基本信息")
+        st.markdown('<div class="section-title">📝 基本信息</div>', unsafe_allow_html=True)
         age = st.number_input("年龄（岁）", min_value=0, max_value=120, value=None)
         gender = st.radio("性别", ["男", "女"])
         genderscore = 1 if gender == "男" else 0
@@ -93,7 +126,7 @@ with st.form("icu_form"):
 
     # -------- 生命体征 --------
     with col2:
-        st.subheader("❤️ 生命体征")
+        st.markdown('<div class="section-title">❤️ 生命体征</div>', unsafe_allow_html=True)
         hr = st.number_input("心率（次/分）", value=None)
         sbp = st.number_input("收缩压（mmHg）", value=None)
         dbp = st.number_input("舒张压（mmHg）", value=None)
@@ -104,7 +137,7 @@ with st.form("icu_form"):
 
     # -------- 其他体征 --------
     with col3:
-        st.subheader("🌡 其他体征")
+        st.markdown('<div class="section-title">🌡 其他体征</div>', unsafe_allow_html=True)
         urine = st.number_input("最后24h尿量（mL）", value=None)
         o2flow = st.number_input("吸氧流量（L/min）", value=None)
         intubated = st.radio("是否气管插管/切开", ["有", "无"])
@@ -113,7 +146,7 @@ with st.form("icu_form"):
 
     # -------- Charlson --------
     with col4:
-        st.subheader("🧾 Charlson 合并症")
+        st.markdown('<div class="section-title">🧾 Charlson 合并症</div>', unsafe_allow_html=True)
         group1 = st.multiselect(
             "1 分",
             ["心肌梗死","充血性心衰","慢性肺病","糖尿病",
@@ -138,9 +171,8 @@ with st.form("icu_form"):
 
     # -------- 影像文本 --------
     with col5:
-        st.subheader("📄 影像学检查文本")
+        st.markdown('<div class="section-title">📄 影像学检查文本</div>', unsafe_allow_html=True)
         img = st.file_uploader("上传影像学报告截图", type=["png","jpg","jpeg"])
-        ocr_text = ""
         if img:
             ocr_text = run_ocr(img, ocr_engine)
             st.text_area("OCR 识别结果", ocr_text, height=120)
@@ -148,10 +180,10 @@ with st.form("icu_form"):
     st.divider()
 
     # ================= 实验室检查 =================
-    st.subheader("🧪 实验室检查")
+    st.markdown('<div class="section-title">🧪 实验室检查</div>', unsafe_allow_html=True)
 
     # ---- 血常规 ----
-    st.markdown("**血常规**")
+    st.markdown('<div class="group-title">血常规</div>', unsafe_allow_html=True)
     cbc = st.columns(7)
     wbc = cbc[0].number_input("白细胞 ×10⁹/L", value=None)
     rbc = cbc[1].number_input("红细胞 ×10¹²/L", value=None)
@@ -162,14 +194,14 @@ with st.form("icu_form"):
     rdw = cbc[6].number_input("红细胞分布宽度 %", value=None)
 
     # ---- 凝血 ----
-    st.markdown("**凝血功能**")
+    st.markdown('<div class="group-title">凝血功能</div>', unsafe_allow_html=True)
     coag = st.columns(3)
     inr = coag[0].number_input("INR", value=None)
     pt = coag[1].number_input("凝血酶原时间 秒", value=None)
     ptt = coag[2].number_input("活化部分凝血活酶时间 秒", value=None)
 
     # ---- 肝肾功 ----
-    st.markdown("**肝肾功 / 生化**")
+    st.markdown('<div class="group-title">肝肾功 / 生化</div>', unsafe_allow_html=True)
     liver = st.columns(5)
     creatinine = liver[0].number_input("肌酐 μmol/L", value=None)
     alt = liver[1].number_input("ALT IU/L", value=None)
@@ -178,7 +210,7 @@ with st.form("icu_form"):
     albumin = liver[4].number_input("白蛋白 g/L", value=None)
 
     # ---- 血气 ----
-    st.markdown("**血气分析**")
+    st.markdown('<div class="group-title">血气分析</div>', unsafe_allow_html=True)
     abg = st.columns(11)
     bicarbonate = abg[0].number_input("HCO₃⁻ mmol/L", value=None)
     calcium = abg[1].number_input("Ca²⁺ mmol/L", value=None)
