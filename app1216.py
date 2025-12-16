@@ -1,4 +1,4 @@
-# app.py  (FINAL – full features, five-column layout, no loss)
+# app.py  (Clinical-style UI, full features preserved)
 
 import numpy as np
 import joblib
@@ -21,31 +21,39 @@ FEATURE_ORDER = [
 ]
 
 # =====================================================
-# Page style – clinical blue/green
+# Page style – clean clinical look
 # =====================================================
 st.set_page_config(page_title="ReAdmit-再入ICU风险预测", layout="wide")
 
 st.markdown("""
 <style>
 body, .stApp {
-    font-size: 0.78rem;
-    line-height: 1.1;
-    background-color: #eef6f6;
+    font-size: 0.82rem;
+    line-height: 1.25;
+    background-color: #f5f7fa;
+    color: #1f2933;
 }
-h1 { font-size: 1.05rem; color:#0f766e; }
+h1 {
+    font-size: 1.2rem;
+    color: #0f4c5c;
+}
+.section {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+}
 .section-title {
-    font-size: 0.78rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    color:#115e59;
-    margin-bottom: 0.2rem;
+    color: #0f4c5c;
+    margin-bottom: 0.4rem;
 }
-.card {
-    background:#ffffff;
-    border-radius:6px;
-    padding:0.45rem;
-    border-left:4px solid #14b8a6;
+label {
+    font-size: 0.8rem;
+    color: #374151;
 }
-label { font-size:0.72rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -70,9 +78,7 @@ def run_ocr(img, engine):
     res = engine.ocr("tmp.png", cls=True)
     if not res or not res[0]:
         return ""
-    text = " ".join([x[1][0] for x in res[0]])
-    text = re.sub(r"\s+", " ", text)
-    return text
+    return re.sub(r"\s+", " ", " ".join([x[1][0] for x in res[0]]))
 
 ocr_engine = load_ocr()
 
@@ -102,60 +108,71 @@ def calc_charlson(age, g1, g2, g3, g4):
 # =====================================================
 with st.form("form"):
 
-    c1,c2,c3,c4,c5 = st.columns(5)
+    # ---------- 上半部分 ----------
+    c1, c2, c3, c4 = st.columns(4)
 
-    # ---------- 基本信息 ----------
     with c1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="section">', unsafe_allow_html=True)
         st.markdown('<div class="section-title">基本信息</div>', unsafe_allow_html=True)
         age = st.number_input("年龄（岁）", value=None)
         gender = st.radio("性别", ["男","女"], horizontal=True)
         genderscore = 1 if gender=="男" else 0
-        los_hospital = st.number_input("住院天数", value=None)
-        los_icu = st.number_input("ICU住院天数", value=None)
+        los_hospital = st.number_input("住院天数（天）", value=None)
+        los_icu = st.number_input("ICU住院天数（天）", value=None)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------- 生命体征 ----------
     with c2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="section">', unsafe_allow_html=True)
         st.markdown('<div class="section-title">生命体征</div>', unsafe_allow_html=True)
-        hr = st.number_input("心率", value=None)
-        sbp = st.number_input("收缩压", value=None)
-        dbp = st.number_input("舒张压", value=None)
+        hr = st.number_input("心率（次/分）", value=None)
+        sbp = st.number_input("收缩压（mmHg）", value=None)
+        dbp = st.number_input("舒张压（mmHg）", value=None)
         mbp = (sbp+2*dbp)/3 if sbp and dbp else 0
-        spo2 = st.number_input("血氧饱和度", value=None)
-        temp = st.number_input("体温", value=None)
+        spo2 = st.number_input("血氧饱和度（%）", value=None)
+        temp = st.number_input("体温（℃）", value=None)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------- 其他情况 ----------
     with c3:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="section">', unsafe_allow_html=True)
         st.markdown('<div class="section-title">其他情况</div>', unsafe_allow_html=True)
-        urine = st.number_input("24h尿量", value=None)
-        o2flow = st.number_input("吸氧流量", value=None)
+        urine = st.number_input("24h尿量（mL）", value=None)
+        o2flow = st.number_input("吸氧流量（L/min）", value=None)
         invasive = st.radio("气管插管/切开", ["有","无"], horizontal=True)
         invasive_flag = 1 if invasive=="有" else 0
-        mech_time = st.number_input("机械通气时长", value=None)
+        mech_time = st.number_input("机械通气时长（小时）", value=None)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------- 合并症 ----------
     with c4:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div class="section-title">合并症</div>', unsafe_allow_html=True)
-        g1 = st.multiselect("1分", ["心肌梗死","充血性心衰","慢性肺病","糖尿病","结缔组织病","周围血管疾病","脑血管疾病","痴呆","溃疡病","轻度肝脏疾病"])
-        g2 = st.multiselect("2分", ["中重度肾脏疾病","白血病","偏瘫","糖尿病伴有器官损害","原发性肿瘤","淋巴瘤"])
+        st.markdown('<div class="section">', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Charlson 合并症</div>', unsafe_allow_html=True)
+
+        g1 = st.multiselect("1分", [
+            "心肌梗死","充血性心衰","慢性肺病","糖尿病",
+            "结缔组织病","周围血管疾病","脑血管疾病","痴呆",
+            "溃疡病","轻度肝脏疾病"
+        ])
+
+        g2 = st.multiselect("2分", [
+            "中重度肾脏疾病","白血病","偏瘫",
+            "糖尿病伴有器官损害","原发性肿瘤","淋巴瘤"
+        ])
+
         g3 = st.multiselect("3分", ["中重度肝病"])
+
         g4 = st.multiselect("6分", ["转移癌","获得性免疫缺陷综合征"])
+
         charlson = calc_charlson(age,g1,g2,g3,g4)
-        st.caption(f"Charlson：{charlson}")
+        st.markdown(f"**Charlson 指数：{charlson}**")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------- 实验室检查（完整） ----------
-    with c5:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown('<div class="section-title">实验室检查</div>', unsafe_allow_html=True)
+    # ---------- 实验室检查（完整，下方） ----------
+    st.markdown('<div class="section">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">实验室检查</div>', unsafe_allow_html=True)
 
-        st.caption("血常规")
+    l1, l2, l3, l4 = st.columns(4)
+
+    with l1:
+        st.markdown("**血常规**")
         wbc = st.number_input("白细胞 ×10⁹/L", value=None)
         rbc = st.number_input("红细胞 ×10¹²/L", value=None)
         hb = st.number_input("血红蛋白 g/L", value=None)
@@ -164,19 +181,22 @@ with st.form("form"):
         plt = st.number_input("血小板 ×10⁹/L", value=None)
         rdw = st.number_input("红细胞分布宽度 %", value=None)
 
-        st.caption("凝血")
+    with l2:
+        st.markdown("**凝血功能**")
         inr = st.number_input("INR", value=None)
-        pt = st.number_input("PT 秒", value=None)
-        ptt = st.number_input("APTT 秒", value=None)
+        pt = st.number_input("凝血酶原时间 秒", value=None)
+        ptt = st.number_input("活化部分凝血活酶时间 秒", value=None)
 
-        st.caption("肝肾功 / 生化")
+    with l3:
+        st.markdown("**肝肾功 / 生化**")
         cr = st.number_input("肌酐 μmol/L", value=None)
         alt = st.number_input("ALT IU/L", value=None)
         ast = st.number_input("AST IU/L", value=None)
         tbil = st.number_input("总胆红素 μmol/L", value=None)
         alb = st.number_input("白蛋白 g/L", value=None)
 
-        st.caption("血气分析")
+    with l4:
+        st.markdown("**血气分析**")
         hco3 = st.number_input("HCO₃⁻ mmol/L", value=None)
         ca = st.number_input("Ca²⁺ mmol/L", value=None)
         cl = st.number_input("Cl⁻ mmol/L", value=None)
@@ -189,10 +209,10 @@ with st.form("form"):
         pao2 = st.number_input("PaO₂ mmHg", value=None)
         paco2 = st.number_input("PaCO₂ mmHg", value=None)
 
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # ---------- OCR ----------
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="section">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">影像学检查文本</div>', unsafe_allow_html=True)
     img = st.file_uploader("上传影像学报告截图", type=["png","jpg","jpeg"])
     if img:
@@ -215,16 +235,19 @@ if submit:
         "urineoutput_24hr":urine,"charlson":charlson,
         "o2_flow":o2flow,"mechanical_ventilation_time":mech_time,
         "invasive_ventilation":invasive_flag,
-        "wbc":wbc,"rbc":rbc,"hemoglobin":hb,"hematocrit":hct,"mch":mch,
-        "platelet":plt,"rdw":rdw,"inr":inr,"pt":pt,"ptt":ptt,
+        "wbc":wbc,"rbc":rbc,"hemoglobin":hb,"hematocrit":hct,
+        "mch":mch,"platelet":plt,"rdw":rdw,
+        "inr":inr,"pt":pt,"ptt":ptt,
         "creatinine":cr,"alt":alt,"ast":ast,"bilirubin_total":tbil,
         "albumin":alb,"bicarbonate":hco3,"calcium":ca,"chloride":cl,
-        "glucose":glu,"sodium":na,"potassium":k,"lactate":lac,
-        "ph":ph,"be":be,"pao2":pao2,"paco2":paco2
+        "glucose":glu,"sodium":na,"potassium":k,
+        "lactate":lac,"ph":ph,"be":be,
+        "pao2":pao2,"paco2":paco2
     }
 
     X = np.array([[float(data.get(f,0) or 0) for f in FEATURE_ORDER]])
     prob = model.predict_proba(X)[0,1]
     risk = "高风险" if prob>=threshold else "低风险"
+
     st.metric("再入 ICU 风险概率", f"{prob:.2%}")
     st.success(f"风险分层：{risk}")
