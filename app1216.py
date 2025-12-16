@@ -181,7 +181,7 @@ with st.form("icu_form"):
         img = st.file_uploader("上传影像学报告截图", type=["png","jpg","jpeg"])
         if img:
             ocr_text = run_ocr(img, ocr_engine)
-            st.text_area("OCR 识别结果", ocr_text, height=120)
+      
 
     st.divider()
 
