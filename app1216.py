@@ -76,44 +76,20 @@ FEATURE_NAME_MAP = {
 # =====================================================
 st.set_page_config(page_title="ReAdmit-再入ICU风险预测", layout="wide")
 
-st.markdown("""
-<style>
-/* 全局字体 */
-body, .stApp {
-    font-size: 0.82rem;
-    line-height: 1.25;
-}
-
-/* 主标题 */
-.main-title {
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: #0b3c5d;
-    margin-bottom: 0.5rem;
-}
-
-/* 各部分标题颜色 */
-.title-basic { font-size: 0.9rem; font-weight: 600; color: #1f7a8c; }
-.title-vital { font-size: 0.9rem; font-weight: 600; color: #b23a48; }
-.title-other { font-size: 0.9rem; font-weight: 600; color: #5f4b8b; }
-.title-charlson { font-size: 0.9rem; font-weight: 600; color: #2f855a; }
-.title-lab { font-size: 0.9rem; font-weight: 600; color: #3b5b92; }
-
-/* 实验室子标题 */
-.group-title {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #334e68;
-    margin-top: 0.35rem;
-    margin-bottom: 0.25rem;
-}
-
-/* 强制所有输入框等宽 */
-div[data-baseweb="input"] {
-    width: 100% !important;
-}
-</style>
-""", unsafe_allow_html=True)
+st.markdown(
+    "<style>"
+    "body, .stApp { font-size: 0.82rem; line-height: 1.25; }"
+    ".main-title { font-size: 1.35rem; font-weight: 700; color: #0b3c5d; margin-bottom: 0.5rem; }"
+    ".title-basic { font-size: 0.9rem; font-weight: 600; color: #1f7a8c; }"
+    ".title-vital { font-size: 0.9rem; font-weight: 600; color: #b23a48; }"
+    ".title-other { font-size: 0.9rem; font-weight: 600; color: #5f4b8b; }"
+    ".title-charlson { font-size: 0.9rem; font-weight: 600; color: #2f855a; }"
+    ".title-lab { font-size: 0.9rem; font-weight: 600; color: #3b5b92; }"
+    ".group-title { font-size: 0.82rem; font-weight: 600; color: #334e68; margin-top: 0.35rem; }"
+    "div[data-baseweb='input'] { width: 100% !important; }"
+    "</style>",
+    unsafe_allow_html=True
+)
 
 st.markdown('<div class="main-title">ReAdmit-再入ICU风险预测</div>', unsafe_allow_html=True)
 
