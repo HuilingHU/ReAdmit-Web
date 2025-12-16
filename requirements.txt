@@ -2,6 +2,7 @@ streamlit
 numpy
 pandas
 joblib
+shap
 xgboost
 requests
 paddleocr
