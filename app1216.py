@@ -144,6 +144,7 @@ def calculate_charlson_score(age, selections):
 # =====================================================
 # UI
 # =====================================================
+st.warning("⚠️ 建议使用于非外科手术患者")
 with st.form("icu_form"):
     col1, col2, col3, col4, col5 = st.columns([0.9,0.9,0.9,0.9,1.1], gap="small")
 
