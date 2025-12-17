@@ -144,7 +144,16 @@ def calculate_charlson_score(age, selections):
 # =====================================================
 # UI
 # =====================================================
-st.warning("⚠️ 建议使用于非外科手术患者")
+# 页面主标题（正文）
+st.markdown('<div class="main-title">ReAdmit-再入ICU风险预测</div>', unsafe_allow_html=True)
+
+# 🔽 标题下方说明文字
+st.markdown(
+    '<div style="font-size:0.8rem; color:#b23a48; margin-bottom:0.6rem;">'
+    '⚠️ 建议使用于非外科手术患者'
+    '</div>',
+    unsafe_allow_html=True
+)
 with st.form("icu_form"):
     col1, col2, col3, col4, col5 = st.columns([0.9,0.9,0.9,0.9,1.1], gap="small")
 
