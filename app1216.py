@@ -167,13 +167,13 @@ with st.form("icu_form"):
     # -------- 生命体征 --------
     with col2:
         st.markdown('<div class="title-vital">❤️ 生命体征</div>', unsafe_allow_html=True)
-        hr = st.number_input("心率（次/分）", value=None)
-        sbp = st.number_input("收缩压（mmHg）", value=None)
-        dbp = st.number_input("舒张压（mmHg）", value=None)
+        hr = st.number_input("心率（次/分）", min_value=20, max_value=250, value=None)
+        sbp = st.number_input("收缩压（mmHg）", min_value=50, max_value=300, value=None)
+        dbp = st.number_input("舒张压（mmHg）", min_value=20, max_value=200, value=None)
         mbp = (sbp + 2 * dbp) / 3 if sbp and dbp else 0
-        st.number_input("平均动脉压（mmHg）", value=mbp, disabled=True)
-        spo2 = st.number_input("血氧饱和度（%）", value=None)
-        temp = st.number_input("体温（℃）", value=None)
+        st.number_input("平均动脉压（mmHg）自动计算", value=mbp, disabled=True)
+        spo2 = st.number_input("血氧饱和度（%）", min_value=50, max_value=100, value=None)
+        temp = st.number_input("体温（℃）", min_value=34, max_value=42, value=None)
 
     # -------- 其他体征 --------
     with col3:
