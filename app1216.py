@@ -144,8 +144,6 @@ def calculate_charlson_score(age, selections):
 # =====================================================
 # UI
 # =====================================================
-# 页面主标题（正文）
-st.markdown('<div class="main-title">ReAdmit-再入ICU风险预测</div>', unsafe_allow_html=True)
 
 # 🔽 标题下方说明文字
 st.markdown(
