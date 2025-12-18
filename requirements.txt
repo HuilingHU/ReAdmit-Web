@@ -4,5 +4,6 @@ pandas
 joblib
 xgboost
 requests
+shap
 paddleocr
 opencv-python-headless
