@@ -332,7 +332,6 @@ if submitted:
     risk = "高风险" if prob >= threshold else "低风险"
 
     st.subheader("📊 预测结果")
-    st.metric("再入 ICU 风险概率", f"{prob:.2%}")
     st.success(f"风险分层：{risk}")
 
     if risk == "高风险":
