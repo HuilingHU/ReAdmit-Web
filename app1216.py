@@ -346,10 +346,51 @@ if submitted:
 
         top_idx = np.argsort(np.abs(vals))[::-1][:5]
 
-        st.subheader("⚠️ 主要风险贡献因素（模型解释）")
+        st.subheader("⚠️ SHAP模型解释（个体化风险贡献）")
 
-        for i in top_idx:
-            fname = FEATURE_ORDER[i]
-            cname = FEATURE_NAME_MAP.get(fname, fname)
-            direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
-            st.write(f"- **{cname}**：{direction}")
+# ===== SHAP explainer =====
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(X)
+
+if isinstance(shap_values, list):
+    vals = shap_values[1][0]
+else:
+    vals = shap_values[0]
+
+# ===== 1️⃣ Top因素（保留你原来的逻辑）=====
+top_idx = np.argsort(np.abs(vals))[::-1][:5]
+
+st.markdown("**🔹 主要风险贡献因素（Top 5）**")
+
+for i in top_idx:
+    fname = FEATURE_ORDER[i]
+    cname = FEATURE_NAME_MAP.get(fname, fname)
+    direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
+    st.write(f"- **{cname}**：{direction}")
+
+# ===== 2️⃣ SHAP 条形图（推荐）=====
+import matplotlib.pyplot as plt
+
+st.markdown("**🔹 风险贡献强度（SHAP值）**")
+
+fig, ax = plt.subplots()
+shap.summary_plot(
+    vals.reshape(1, -1),
+    features=X,
+    feature_names=[FEATURE_NAME_MAP.get(f, f) for f in FEATURE_ORDER],
+    plot_type="bar",
+    show=False
+)
+st.pyplot(fig)
+
+# ===== 3️⃣ 单个患者解释（高级）=====
+st.markdown("**🔹 个体化解释（Waterfall Plot）**")
+
+fig2 = plt.figure()
+shap.plots._waterfall.waterfall_legacy(
+    explainer.expected_value[1] if isinstance(explainer.expected_value, list) else explainer.expected_value,
+    vals,
+    feature_names=[FEATURE_NAME_MAP.get(f, f) for f in FEATURE_ORDER],
+    max_display=10
+)
+st.pyplot(fig2)
