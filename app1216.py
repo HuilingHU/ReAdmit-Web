@@ -334,10 +334,9 @@ if submitted:
     st.subheader("📊 预测结果")
     st.success(f"风险分层：{risk}")
     if risk == "高风险":
-    try:
+        try:
         import shap
         import matplotlib.pyplot as plt
-
         st.subheader("⚠️ SHAP模型解释（个体化风险贡献）")
 
         # ===== 1️⃣ 创建 explainer =====
@@ -377,7 +376,7 @@ if submitted:
     except Exception as e:
         st.error("SHAP解释暂不可用")
         st.text(str(e))
-   
+    
 
 
 
