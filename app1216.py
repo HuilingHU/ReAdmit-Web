@@ -333,8 +333,7 @@ if submitted:
 
     st.subheader("📊 预测结果")
     st.success(f"风险分层：{risk}")
-
-if risk == "高风险":
+    if risk == "高风险":
     try:
         import shap
         import matplotlib.pyplot as plt
@@ -378,3 +377,7 @@ if risk == "高风险":
     except Exception as e:
         st.error("SHAP解释暂不可用")
         st.text(str(e))   # 👉 显示真实错误
+
+
+
+
