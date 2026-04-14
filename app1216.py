@@ -371,8 +371,8 @@ if submitted:
             plt.clf()
 
         except Exception as e:
-            st.error("SHAP解释暂不可用")
-            st.text(str(e))
+            st.error("SHAP解释报错（真实错误如下）")
+            st.exception(e)
     
 
 
