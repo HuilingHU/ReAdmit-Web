@@ -337,28 +337,39 @@ if submitted:
         try:
             import shap
             import matplotlib.pyplot as plt
+
             st.subheader("⚠️ SHAP模型解释（个体化风险贡献）")
+
+        # ===== explainer（更稳）=====
             explainer = shap.TreeExplainer(model)
             shap_values = explainer.shap_values(X)
-            shap_obj = shap.Explanation(values=shap_values[0], base_values=explainer.expected_value, data=X[0])
-            shap_values = explainer(X)
-            vals = shap_values.values[0]
-            shap_obj = shap_values[0]
+
+            vals = shap_values[0]
+
+        # ===== Top5 =====
             top_idx = np.argsort(np.abs(vals))[::-1][:5]
+
             st.markdown("**🔹 主要风险贡献因素（Top 5）**")
+
             for i in top_idx:
                 fname = FEATURE_ORDER[i]
                 cname = FEATURE_NAME_MAP.get(fname, fname)
                 direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
                 st.write(f"- **{cname}**：{direction}")
+
+        # ===== bar plot =====
             st.markdown("**🔹 风险贡献强度（SHAP值）**")
+            shap_obj = shap.Explanation(values=vals, base_values=explainer.expected_value, data=X[0])
             shap.plots.bar(shap_obj, max_display=10, show=False)
             st.pyplot(plt.gcf())
             plt.clf()
+
+        # ===== waterfall =====
             st.markdown("**🔹 个体化解释（Waterfall Plot）**")
             shap.plots.waterfall(shap_obj, max_display=10, show=False)
             st.pyplot(plt.gcf())
             plt.clf()
+
         except Exception as e:
             st.error("SHAP解释暂不可用")
             st.text(str(e))
