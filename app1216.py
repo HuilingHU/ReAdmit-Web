@@ -338,7 +338,9 @@ if submitted:
             import shap
             import matplotlib.pyplot as plt
             st.subheader("⚠️ SHAP模型解释（个体化风险贡献）")
-            explainer = shap.Explainer(model)
+            explainer = shap.TreeExplainer(model)
+            shap_values = explainer.shap_values(X)
+            shap_obj = shap.Explanation(values=shap_values[0], base_values=explainer.expected_value, data=X[0])
             shap_values = explainer(X)
             vals = shap_values.values[0]
             shap_obj = shap_values[0]
@@ -348,7 +350,7 @@ if submitted:
                 fname = FEATURE_ORDER[i]
                 cname = FEATURE_NAME_MAP.get(fname, fname)
                 direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
-            st.write(f"- **{cname}**：{direction}")
+                st.write(f"- **{cname}**：{direction}")
             st.markdown("**🔹 风险贡献强度（SHAP值）**")
             shap.plots.bar(shap_obj, max_display=10, show=False)
             st.pyplot(plt.gcf())
