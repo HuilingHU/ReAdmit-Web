@@ -335,47 +335,31 @@ if submitted:
     st.success(f"风险分层：{risk}")
     if risk == "高风险":
         try:
-        import shap
-        import matplotlib.pyplot as plt
-        st.subheader("⚠️ SHAP模型解释（个体化风险贡献）")
-
-        # ===== 1️⃣ 创建 explainer =====
-        explainer = shap.Explainer(model)
-
-        # ===== 2️⃣ 计算 SHAP =====
-        shap_values = explainer(X)
-
-        vals = shap_values.values[0]
-        shap_obj = shap_values[0]
-
-        # ===== 3️⃣ Top5 =====
-        top_idx = np.argsort(np.abs(vals))[::-1][:5]
-
-        st.markdown("**🔹 主要风险贡献因素（Top 5）**")
-
-        for i in top_idx:
-            fname = FEATURE_ORDER[i]
-            cname = FEATURE_NAME_MAP.get(fname, fname)
-            direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
+            import shap
+            import matplotlib.pyplot as plt
+            st.subheader("⚠️ SHAP模型解释（个体化风险贡献）")
+            explainer = shap.Explainer(model)
+            shap_values = explainer(X)
+            vals = shap_values.values[0]
+            shap_obj = shap_values[0]
+            top_idx = np.argsort(np.abs(vals))[::-1][:5]
+            st.markdown("**🔹 主要风险贡献因素（Top 5）**")
+            for i in top_idx:
+                fname = FEATURE_ORDER[i]
+                cname = FEATURE_NAME_MAP.get(fname, fname)
+                direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
             st.write(f"- **{cname}**：{direction}")
-
-        # ===== 4️⃣ SHAP bar =====
-        st.markdown("**🔹 风险贡献强度（SHAP值）**")
-
-        fig, ax = plt.subplots()
-        shap.plots.bar(shap_obj, max_display=10, show=False)
-        st.pyplot(fig)
-
-        # ===== 5️⃣ waterfall =====
-        st.markdown("**🔹 个体化解释（Waterfall Plot）**")
-
-        fig2 = plt.figure()
-        shap.plots.waterfall(shap_obj, max_display=10, show=False)
-        st.pyplot(fig2)
-
-    except Exception as e:
-        st.error("SHAP解释暂不可用")
-        st.text(str(e))
+            st.markdown("**🔹 风险贡献强度（SHAP值）**")
+            fig, ax = plt.subplots()
+            shap.plots.bar(shap_obj, max_display=10, show=False)
+            st.pyplot(fig)
+            st.markdown("**🔹 个体化解释（Waterfall Plot）**")
+            fig2 = plt.figure()
+            shap.plots.waterfall(shap_obj, max_display=10, show=False)
+            st.pyplot(fig2)
+        except Exception as e:
+            st.error("SHAP解释暂不可用")
+            st.text(str(e))
     
 
 
