@@ -350,13 +350,13 @@ if submitted:
                 direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
             st.write(f"- **{cname}**：{direction}")
             st.markdown("**🔹 风险贡献强度（SHAP值）**")
-            fig, ax = plt.subplots()
             shap.plots.bar(shap_obj, max_display=10, show=False)
-            st.pyplot(fig)
+            st.pyplot(plt.gcf())
+            plt.clf()
             st.markdown("**🔹 个体化解释（Waterfall Plot）**")
-            fig2 = plt.figure()
             shap.plots.waterfall(shap_obj, max_display=10, show=False)
-            st.pyplot(fig2)
+            st.pyplot(plt.gcf())
+            plt.clf()
         except Exception as e:
             st.error("SHAP解释暂不可用")
             st.text(str(e))
