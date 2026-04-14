@@ -327,7 +327,12 @@ if submitted:
         if data.get(k) is not None:
             data[k] = data[k] * factor
     
-    X = np.array([[float(data.get(f, 0) or 0) for f in FEATURE_ORDER]])
+    import pandas as pd
+
+    X = pd.DataFrame(
+        [[float(data.get(f, 0) or 0) for f in FEATURE_ORDER]],
+        columns=FEATURE_ORDER
+    )
     prob = model.predict_proba(X)[0, 1]
     risk = "高风险" if prob >= threshold else "低风险"
 
