@@ -364,7 +364,7 @@ if submitted:
 
         # ===== bar plot =====
             st.markdown("**🔹 风险贡献强度（SHAP值）**")
-            shap_obj = shap.Explanation(values=vals, base_values=explainer.expected_value, data=X[0])
+            shap_obj = shap.Explanation(values=vals, base_values=explainer.expected_value, data=X.iloc[0])
             shap.plots.bar(shap_obj, max_display=10, show=False)
             st.pyplot(plt.gcf())
             plt.clf()
