@@ -350,12 +350,8 @@ if submitted:
 
 # ===== SHAP explainer =====
 explainer = shap.TreeExplainer(model)
-shap_values = explainer.shap_values(X)
-
-if isinstance(shap_values, list):
-    vals = shap_values[1][0]
-else:
-    vals = shap_values[0]
+shap_values = explainer(X)
+vals = shap_values[0]
 
 # ===== 1️⃣ Top因素（保留你原来的逻辑）=====
 top_idx = np.argsort(np.abs(vals))[::-1][:5]
