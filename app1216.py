@@ -334,50 +334,47 @@ if submitted:
     st.subheader("📊 预测结果")
     st.success(f"风险分层：{risk}")
 
-    if risk == "高风险":
-        explainer = shap.TreeExplainer(model)
-        shap_values = explainer.shap_values(X)
-
-        # 二分类，取正类
-        if isinstance(shap_values, list):
-            vals = shap_values[1][0]
-        else:
-            vals = shap_values[0]
-
-        top_idx = np.argsort(np.abs(vals))[::-1][:5]
+if risk == "高风险":
+    try:
+        import shap
+        import matplotlib.pyplot as plt
 
         st.subheader("⚠️ SHAP模型解释（个体化风险贡献）")
-# ===== SHAP explainer =====
-explainer = shap.Explainer(model)   # ✅ 不要用 TreeExplainer（更稳）
 
-shap_values = explainer(X)
+        # ===== 1️⃣ 创建 explainer（最稳写法）=====
+        explainer = shap.Explainer(model)
 
-vals = shap_values.values[0]        # ✅ 正确取值
-base_value = shap_values.base_values[0]
+        # ===== 2️⃣ 计算 SHAP =====
+        shap_values = explainer(X)
 
-# ===== 1️⃣ Top因素 =====
-top_idx = np.argsort(np.abs(vals))[::-1][:5]
+        vals = shap_values.values[0]   # 当前患者
+        shap_obj = shap_values[0]
 
-st.markdown("**🔹 主要风险贡献因素（Top 5）**")
+        # ===== 3️⃣ Top5 风险因素 =====
+        top_idx = np.argsort(np.abs(vals))[::-1][:5]
 
-for i in top_idx:
-    fname = FEATURE_ORDER[i]
-    cname = FEATURE_NAME_MAP.get(fname, fname)
-    direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
-    st.write(f"- **{cname}**：{direction}")
+        st.markdown("**🔹 主要风险贡献因素（Top 5）**")
 
-# ===== 2️⃣ SHAP 条形图 =====
-import matplotlib.pyplot as plt
+        for i in top_idx:
+            fname = FEATURE_ORDER[i]
+            cname = FEATURE_NAME_MAP.get(fname, fname)
+            direction = "↑ 增加风险" if vals[i] > 0 else "↓ 降低风险"
+            st.write(f"- **{cname}**：{direction}")
 
-st.markdown("**🔹 风险贡献强度（SHAP值）**")
+        # ===== 4️⃣ SHAP 条形图 =====
+        st.markdown("**🔹 风险贡献强度（SHAP值）**")
 
-fig, ax = plt.subplots()
-shap.plots.bar(shap_values[0], max_display=10, show=False)   # ✅ 新API
-st.pyplot(fig)
+        fig, ax = plt.subplots()
+        shap.plots.bar(shap_obj, max_display=10, show=False)
+        st.pyplot(fig)
 
-# ===== 3️⃣ Waterfall（推荐）=====
-st.markdown("**🔹 个体化解释（Waterfall Plot）**")
+        # ===== 5️⃣ Waterfall 图 =====
+        st.markdown("**🔹 个体化解释（Waterfall Plot）**")
 
-fig2 = plt.figure()
-shap.plots.waterfall(shap_values[0], max_display=10, show=False)   # ✅ 新API
-st.pyplot(fig2)
+        fig2 = plt.figure()
+        shap.plots.waterfall(shap_obj, max_display=10, show=False)
+        st.pyplot(fig2)
+
+    except Exception as e:
+        st.error("SHAP解释暂不可用")
+        st.text(str(e))   # 👉 显示真实错误
