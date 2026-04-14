@@ -334,7 +334,7 @@ if submitted:
     st.subheader("📊 预测结果")
     st.success(f"风险分层：{risk}")
     if risk == "高风险":
-    try:
+        try:
         import shap
         import matplotlib.pyplot as plt
 
